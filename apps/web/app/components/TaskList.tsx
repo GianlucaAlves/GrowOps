@@ -77,7 +77,9 @@ export default function TaskList() {
         body: JSON.stringify({
           title: editingTitle,
           type: editingType,
-          dueAt: editingDueAt ? new Date(editingDueAt).toISOString() : undefined,
+          dueAt: editingDueAt
+            ? new Date(editingDueAt).toISOString()
+            : undefined,
         }),
       });
 
@@ -116,7 +118,9 @@ export default function TaskList() {
     const previous = tasks;
     setDeletingTaskId(taskId);
     setError("");
-    setTasks((curr) => (curr ? curr.filter((task) => task.id !== taskId) : curr));
+    setTasks((curr) =>
+      curr ? curr.filter((task) => task.id !== taskId) : curr,
+    );
 
     try {
       const apiBase =
