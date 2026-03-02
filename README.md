@@ -1,9 +1,9 @@
-# GrowOps - Cultivation Operations Manager
+# Plandica - Cultivation Operations Manager
 
 <p align="center">
   <img src="docs/assets/growops-logo.png" alt="GrowOps Logo" width="200px">
-  <h2 align="center">GrowOps</h2>
-  <h4 align="center">Sistema de Gestão de Cultivo para Jardinagem Legalizada</h4>
+  <h2 align="center">Plandica</h2>
+  <h4 align="center">Sistema de Gestão de Cultivo para Jardinagem</h4>
 </p>
 
 <p align="center">
@@ -22,7 +22,7 @@
 > **Data:** Fevereiro 2026
 >
 > [Pasta de Documentação](./docs)  \
-> [Repositório GitHub](https://github.com/Duraxxi/growops)
+> [Repositório GitHub](https://github.com/GianlucaAlves/growops)
 
 ---
 
@@ -41,7 +41,7 @@ Jardineiros domésticos enfrentam dificuldades em manter registros consistentes,
 
 ## 💡 Solução <a id="solucao"></a>
 
-O **GrowOps** é um sistema full-stack de gerenciamento de cultivo doméstico que permite ao usuário registrar, rastrear e analisar todo o ciclo de vida de suas plantas de forma organizada, privada e profissional.
+O **Plandica** é um sistema full-stack de gerenciamento de cultivo doméstico que permite ao usuário registrar, rastrear e analisar todo o ciclo de vida de suas plantas de forma organizada, privada e profissional.
 
 **Diferenciais da solução:**
 - **Rastreabilidade completa:** De semente/clone até colheita e cura, com histórico detalhado
