@@ -1,4 +1,4 @@
-import Header from "./components/header";
+import Header from "./components/header/index";
 import "./globals.css";
 import { Fredoka, Nunito } from "next/font/google";
 

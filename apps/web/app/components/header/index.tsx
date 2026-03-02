@@ -28,7 +28,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b-2 border-border/80 bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/90 textured-paper">
+    <header className="sticky top-0 z-20 border-b-2 border-border/80 bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/90">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
         <Link href="/" className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-[16px_20px_18px_14px] border-2 border-primary/30 bg-primary text-xl text-primary-foreground organic-shadow">
@@ -82,7 +82,7 @@ export default function Header() {
             <button
               type="button"
               onClick={handleLogout}
-              className="hand-drawn-button bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground"
+              className="hand-drawn-button-stable bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground"
             >
               Sair
             </button>
@@ -96,7 +96,7 @@ export default function Header() {
               </Link>
               <Link
                 href="/auth/register"
-                className="hand-drawn-button bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground"
+                className="hand-drawn-button-stable bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground"
               >
                 Criar conta
               </Link>

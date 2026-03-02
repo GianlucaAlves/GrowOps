@@ -4,11 +4,12 @@ import { Button } from "@/app/components/ui/button";
 import QuickActions from "./components/QuickActions";
 import TaskList from "./components/TaskList";
 import DailyJournal from "./components/DailyJournal";
+import GardenPlantOverview from "./components/GardenPlantOverview";
 
 export default function HomePage() {
   return (
     <main className="mx-auto max-w-6xl space-y-6 py-6 md:space-y-8 md:py-8">
-      <section className="hand-drawn-card organic-shadow textured-paper p-5 md:p-7">
+      <section className="hand-drawn-card organic-shadow p-5 md:p-7">
         <div className="grid gap-6 lg:grid-cols-12 lg:items-center">
           <div className="lg:col-span-7">
             <p className="mb-2 inline-flex items-center gap-2 hand-drawn-pill px-3 py-1 text-xs font-semibold text-muted-foreground">
@@ -42,10 +43,10 @@ export default function HomePage() {
               <div className="mb-4 rounded-[30px_22px_26px_20px] border-2 border-border/90 bg-card px-4 py-5 text-center">
                 <p className="text-4xl leading-none">🧑‍🌾🌿</p>
                 <p className="mt-2 text-sm font-bold">
-                  Zé cuidando das plantinhas
+                  Bora cuidar dessas plantinhas
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Ilustração acolhedora da rotina no jardim.
+                  Organize a rotina do seu jardim
                 </p>
               </div>
 
@@ -81,14 +82,13 @@ export default function HomePage() {
       </section>
 
       <section className="grid gap-5 lg:grid-cols-12">
-        <div className="space-y-5 lg:col-span-8">
+        <div className="space-y-5 lg:col-span-7">
           <Card className="hand-drawn-card organic-shadow p-5 md:p-6">
             <h3 className="mb-1 text-base font-black uppercase tracking-wide md:text-lg">
               Tarefas do Jardim
             </h3>
             <p className="mb-3 text-sm text-muted-foreground">
-              Este bloco usa tarefas reais do backend e permite marcar como
-              concluída.
+              Organize as tarefas do seu dia para cuidar do seu jardim de forma simples e eficiente.
             </p>
             <div className="mb-4 flex flex-wrap gap-2">
               <Link
@@ -109,6 +109,16 @@ export default function HomePage() {
 
           <Card className="hand-drawn-card organic-shadow p-5 md:p-6">
             <h3 className="mb-2 text-base font-black uppercase tracking-wide md:text-lg">
+              Jardins e Plantas
+            </h3>
+            <p className="mb-3 text-sm text-muted-foreground">
+              Veja seus jardins e as plantas de cada um para agir mais rápido.
+            </p>
+            <GardenPlantOverview />
+          </Card>
+
+          <Card className="hand-drawn-card organic-shadow p-5 md:p-6">
+            <h3 className="mb-2 text-base font-black uppercase tracking-wide md:text-lg">
               Plano do Dia
             </h3>
             <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
@@ -119,7 +129,7 @@ export default function HomePage() {
           </Card>
         </div>
 
-        <aside className="space-y-5 lg:col-span-4">
+        <aside className="space-y-5 lg:col-span-5">
           <Card className="hand-drawn-card organic-shadow p-5 md:p-6">
             <h3 className="mb-1 text-base font-black uppercase tracking-wide md:text-lg">
               Ações Rápidas

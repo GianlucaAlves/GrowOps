@@ -1,5 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import { createEventForUser, getEventsForDay } from "../services/eventService";
+import {
+  createEventForUser,
+  deleteEventForUser,
+  getEventsForDay,
+  getEventsForUser,
+  updateEventForUser,
+} from "../services/eventService";
 
 const allowedTypes = [
   "watering",
@@ -15,6 +21,48 @@ const allowedTypes = [
 ] as const;
 
 type EventType = (typeof allowedTypes)[number];
+
+export async function listEvents(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const plantId =
+      typeof req.query.plantId === "string" ? req.query.plantId : undefined;
+    const gardenId =
+      typeof req.query.gardenId === "string" ? req.query.gardenId : undefined;
+
+    const startDateRaw =
+      typeof req.query.startDate === "string"
+        ? new Date(req.query.startDate)
+        : undefined;
+    const endDateRaw =
+      typeof req.query.endDate === "string"
+        ? new Date(req.query.endDate)
+        : undefined;
+
+    const startDate =
+      startDateRaw && !Number.isNaN(startDateRaw.getTime())
+        ? startDateRaw
+        : undefined;
+    const endDate =
+      endDateRaw && !Number.isNaN(endDateRaw.getTime())
+        ? endDateRaw
+        : undefined;
+
+    const events = await getEventsForUser(req.user.id, {
+      plantId,
+      gardenId,
+      startDate,
+      endDate,
+    });
+
+    return res.json({ events });
+  } catch (err) {
+    return next(err);
+  }
+}
 
 export async function listTodayEvents(
   req: Request,
@@ -70,6 +118,68 @@ export async function createEvent(
   } catch (err) {
     if (err instanceof Error && err.message === "Plant not found") {
       return res.status(404).json({ message: "Planta não encontrada" });
+    }
+
+    return next(err);
+  }
+}
+
+export async function updateEvent(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const eventId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const { plantId, type, description, note } = req.body as {
+      plantId?: string;
+      type?: EventType;
+      description?: string;
+      note?: string;
+    };
+
+    if (type && !allowedTypes.includes(type)) {
+      return res.status(422).json({ message: "type inválido" });
+    }
+
+    const event = await updateEventForUser(req.user.id, eventId, {
+      plantId: plantId?.trim() || undefined,
+      type,
+      description: description?.trim(),
+      note: note?.trim(),
+    });
+
+    return res.json({ event });
+  } catch (err) {
+    if (err instanceof Error && err.message === "Plant not found") {
+      return res.status(404).json({ message: "Planta não encontrada" });
+    }
+
+    if (err instanceof Error && err.message === "Event not found") {
+      return res.status(404).json({ message: "Registro não encontrado" });
+    }
+
+    return next(err);
+  }
+}
+
+export async function deleteEvent(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    const eventId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+
+    await deleteEventForUser(req.user.id, eventId);
+    return res.status(204).send();
+  } catch (err) {
+    if (err instanceof Error && err.message === "Event not found") {
+      return res.status(404).json({ message: "Registro não encontrado" });
     }
 
     return next(err);

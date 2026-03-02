@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 import { Card } from "@/app/components/ui/card";
 import { Input } from "@/app/components/ui/input";
 
+type Plant = {
+  id: string;
+  name: string;
+  garden?: { id: string; name: string } | null;
+};
+
 export default function AnotacaoPage() {
+  const searchParams = useSearchParams();
+  const plantIdFromUrl = searchParams.get("plantId") || "";
+
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [plantId, setPlantId] = useState("");
   const [titulo, setTitulo] = useState("");
   const [conteudo, setConteudo] = useState("");
   const [quando, setQuando] = useState(() => {
@@ -18,6 +29,39 @@ export default function AnotacaoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    async function loadPlants() {
+      try {
+        const apiBase =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const res = await fetch(`${apiBase}/plants`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        });
+
+        const data = await res.json();
+        if (!res.ok) return;
+
+        const list = data.plants || [];
+        setPlants(list);
+
+        const selected = list.find(
+          (plant: Plant) => plant.id === plantIdFromUrl,
+        );
+        if (selected) {
+          setPlantId(selected.id);
+        } else if (list[0]) {
+          setPlantId(list[0].id);
+        }
+      } catch {}
+    }
+
+    loadPlants();
+  }, [plantIdFromUrl]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,18 +74,21 @@ export default function AnotacaoPage() {
       if (!token) {
         throw new Error("Faça login para registrar ações");
       }
-      const title = `Anotação: ${titulo || "Sem título"}${conteudo ? ` - ${conteudo}` : ""}`;
+      if (!plantId) {
+        throw new Error("Selecione uma planta");
+      }
 
-      const res = await fetch(`${apiBase}/tasks`, {
+      const res = await fetch(`${apiBase}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          title,
-          type: "note",
-          dueAt: new Date(quando).toISOString(),
+          plantId,
+          type: "observation",
+          description: titulo || "Observação",
+          note: `${conteudo || "Sem detalhes"} (${new Date(quando).toLocaleString("pt-BR")})`,
         }),
       });
 
@@ -49,8 +96,9 @@ export default function AnotacaoPage() {
       const data = contentType.includes("application/json")
         ? await res.json()
         : { message: await res.text() };
-      if (!res.ok) throw new Error(data.message || "Falha ao salvar anotação");
-      router.push("/");
+      if (!res.ok)
+        throw new Error(data.message || "Falha ao registrar anotação");
+      router.push(`/diario?plantId=${plantId}`);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Erro ao salvar");
@@ -73,6 +121,23 @@ export default function AnotacaoPage() {
 
       <Card className="rounded-3xl p-5 md:p-6">
         <form onSubmit={handleSubmit} className="space-y-3">
+          <label className="block text-sm font-medium">Planta cadastrada</label>
+          <select
+            value={plantId}
+            onChange={(e) => setPlantId(e.target.value)}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {plants.length === 0 ? (
+              <option value="">Sem plantas cadastradas</option>
+            ) : null}
+            {plants.map((plant) => (
+              <option key={plant.id} value={plant.id}>
+                {plant.name}{" "}
+                {plant.garden?.name ? `(${plant.garden.name})` : ""}
+              </option>
+            ))}
+          </select>
+
           <div className="flex flex-wrap gap-2">
             {["Checagem geral", "Mudança de folhas", "Ajuste de rotina"].map(
               (preset) => (
@@ -112,8 +177,12 @@ export default function AnotacaoPage() {
             </p>
           )}
           <div className="flex gap-2 pt-2">
-            <Button type="submit" disabled={loading} className="rounded-xl">
-              {loading ? "Salvando..." : "Salvar anotação"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="hand-drawn-button-stable rounded-xl bg-accent text-accent-foreground"
+            >
+              {loading ? "Salvando..." : "Registrar anotação no diário"}
             </Button>
             <Button asChild variant="outline" className="rounded-xl">
               <Link href="/">Voltar</Link>

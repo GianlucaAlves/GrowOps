@@ -121,28 +121,6 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-nunito), sans-serif;
-    background-image:
-      repeating-linear-gradient(
-        -8deg,
-        color-mix(in oklab, var(--background) 92%, #fff) 0 8px,
-        color-mix(in oklab, var(--background) 88%, #ece5c8) 8px 16px
-      ),
-      radial-gradient(
-        circle at 15% 12%,
-        color-mix(in oklab, var(--primary) 10%, transparent) 0,
-        transparent 35%
-      ),
-      radial-gradient(
-        circle at 90% 0%,
-        color-mix(in oklab, var(--accent) 12%, transparent) 0,
-        transparent 30%
-      ),
-      radial-gradient(
-        circle at 50% 100%,
-        color-mix(in oklab, var(--secondary) 50%, transparent) 0,
-        transparent 30%
-      );
-    background-attachment: fixed;
   }
 
   h1,
@@ -190,6 +168,40 @@
     background: color-mix(in oklab, var(--background) 86%, #fff);
   }
 
+  .action-pill-edit {
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .action-pill-edit:hover {
+    transform: translateY(-1px);
+    background: color-mix(in oklab, var(--secondary) 70%, #fff 30%);
+    border-color: color-mix(in oklab, var(--primary) 44%, var(--border) 56%);
+    color: color-mix(in oklab, var(--foreground) 82%, var(--primary) 18%);
+  }
+
+  .action-pill-delete {
+    transition:
+      transform 180ms ease,
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .action-pill-delete:hover {
+    transform: translateY(-1px);
+    background: color-mix(in oklab, var(--destructive) 14%, #fff 86%);
+    border-color: color-mix(
+      in oklab,
+      var(--destructive) 55%,
+      var(--border) 45%
+    );
+    color: color-mix(in oklab, var(--destructive) 85%, #8c1d1d 15%);
+  }
+
   .hand-drawn-button {
     border-radius: 999px;
     border: 2px solid color-mix(in oklab, var(--accent) 62%, var(--primary) 38%);
@@ -206,6 +218,20 @@
       color-mix(in oklab, var(--accent) 40%, var(--primary) 60%);
   }
 
+  .hand-drawn-button-stable {
+    border-radius: 999px;
+    border: 2px solid color-mix(in oklab, var(--accent) 62%, var(--primary) 38%);
+    box-shadow: 0 2px 0
+      color-mix(in oklab, var(--accent) 38%, var(--primary) 62%);
+    transition:
+      background-color 180ms ease,
+      opacity 180ms ease;
+  }
+
+  .hand-drawn-button-stable:hover {
+    opacity: 0.94;
+  }
+
   .hover-lift {
     transition:
       transform 220ms ease,
@@ -213,9 +239,9 @@
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px) rotate(-0.4deg);
+    transform: translateY(-1px);
     box-shadow:
-      0 12px 20px -18px color-mix(in oklab, var(--primary) 60%, transparent),
+      0 10px 16px -18px color-mix(in oklab, var(--primary) 60%, transparent),
       0 3px 0 color-mix(in oklab, var(--primary) 28%, transparent);
   }
 }

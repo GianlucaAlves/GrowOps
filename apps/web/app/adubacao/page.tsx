@@ -1,13 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/app/components/ui/button";
 import { Card } from "@/app/components/ui/card";
 import { Input } from "@/app/components/ui/input";
 
+type Plant = {
+  id: string;
+  name: string;
+  garden?: { id: string; name: string } | null;
+};
+
 export default function AdubacaoPage() {
+  const searchParams = useSearchParams();
+  const plantIdFromUrl = searchParams.get("plantId") || "";
+
+  const [plants, setPlants] = useState<Plant[]>([]);
+  const [plantId, setPlantId] = useState("");
   const [planta, setPlanta] = useState("");
   const [produto, setProduto] = useState("");
   const [quando, setQuando] = useState(() => {
@@ -18,6 +29,41 @@ export default function AdubacaoPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    async function loadPlants() {
+      try {
+        const apiBase =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
+        const token = localStorage.getItem("accessToken");
+        if (!token) return;
+
+        const res = await fetch(`${apiBase}/plants`, {
+          headers: { Authorization: `Bearer ${token}` },
+          credentials: "include",
+        });
+
+        const data = await res.json();
+        if (!res.ok) return;
+
+        const list = data.plants || [];
+        setPlants(list);
+
+        const selected = list.find(
+          (plant: Plant) => plant.id === plantIdFromUrl,
+        );
+        if (selected) {
+          setPlantId(selected.id);
+          setPlanta(selected.name);
+        } else if (list[0]) {
+          setPlantId(list[0].id);
+          setPlanta(list[0].name);
+        }
+      } catch {}
+    }
+
+    loadPlants();
+  }, [plantIdFromUrl]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,18 +76,21 @@ export default function AdubacaoPage() {
       if (!token) {
         throw new Error("Faça login para registrar ações");
       }
-      const title = `Adubação: ${planta || "Planta"}${produto ? ` (${produto})` : ""}`;
+      if (!plantId) {
+        throw new Error("Selecione uma planta");
+      }
 
-      const res = await fetch(`${apiBase}/tasks`, {
+      const res = await fetch(`${apiBase}/events`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          title,
+          plantId,
           type: "feeding",
-          dueAt: new Date(quando).toISOString(),
+          description: `Adubação ${produto ? `com ${produto}` : ""}`.trim(),
+          note: `Aplicado em ${new Date(quando).toLocaleString("pt-BR")}`,
         }),
       });
 
@@ -49,8 +98,9 @@ export default function AdubacaoPage() {
       const data = contentType.includes("application/json")
         ? await res.json()
         : { message: await res.text() };
-      if (!res.ok) throw new Error(data.message || "Falha ao salvar adubação");
-      router.push("/");
+      if (!res.ok)
+        throw new Error(data.message || "Falha ao registrar adubação");
+      router.push(`/diario?plantId=${plantId}`);
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Erro ao salvar");
@@ -75,6 +125,29 @@ export default function AdubacaoPage() {
 
       <Card className="rounded-3xl p-5 md:p-6">
         <form onSubmit={handleSubmit} className="space-y-3">
+          <label className="block text-sm font-medium">Planta cadastrada</label>
+          <select
+            value={plantId}
+            onChange={(e) => {
+              const selected = plants.find(
+                (plant) => plant.id === e.target.value,
+              );
+              setPlantId(e.target.value);
+              setPlanta(selected?.name || "");
+            }}
+            className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {plants.length === 0 ? (
+              <option value="">Sem plantas cadastradas</option>
+            ) : null}
+            {plants.map((plant) => (
+              <option key={plant.id} value={plant.id}>
+                {plant.name}{" "}
+                {plant.garden?.name ? `(${plant.garden.name})` : ""}
+              </option>
+            ))}
+          </select>
+
           <div className="flex flex-wrap gap-2">
             {[
               { label: "Orgânico", produto: "Adubo orgânico" },
@@ -91,12 +164,6 @@ export default function AdubacaoPage() {
               </button>
             ))}
           </div>
-          <label className="block text-sm font-medium">Planta</label>
-          <Input
-            placeholder="Ex.: Manjericão"
-            value={planta}
-            onChange={(e) => setPlanta(e.target.value)}
-          />
           <label className="block text-sm font-medium">Produto</label>
           <Input
             placeholder="Ex.: Adubo orgânico"
@@ -115,8 +182,12 @@ export default function AdubacaoPage() {
             </p>
           )}
           <div className="flex gap-2 pt-2">
-            <Button type="submit" disabled={loading} className="rounded-xl">
-              {loading ? "Salvando..." : "Salvar adubação"}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="hand-drawn-button-stable rounded-xl bg-accent text-accent-foreground"
+            >
+              {loading ? "Salvando..." : "Registrar adubação no diário"}
             </Button>
             <Button asChild variant="outline" className="rounded-xl">
               <Link href="/">Voltar</Link>

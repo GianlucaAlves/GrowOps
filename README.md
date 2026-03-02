@@ -330,7 +330,7 @@ model Task {
 
 ### 1) Clonar
 ```bash
-git clone https://github.com/Duraxxi/growops.git
+git clone https://github.com/GianlucaAlves/growops.git
 cd growops
 npm install
 ```
@@ -366,5 +366,5 @@ npm run dev
 ## 👤 Autor <a id="autor"></a>
 
 Gianluca Lourenço
-- GitHub: https://github.com/Duraxxi
-- LinkedIn: https://www.linkedin.com/in/gianluca-lourencco/
+- GitHub: https://github.com/GianlucaAlves
+- LinkedIn: https://www.linkedin.com/in/gianluca-alves/

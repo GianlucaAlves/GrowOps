@@ -50,3 +50,48 @@ export function createPlantInDb(
     },
   });
 }
+
+export function findPlantByIdAndUser(userId: string, plantId: string) {
+  return prisma.plant.findFirst({
+    where: { id: plantId, userId },
+    include: {
+      garden: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+}
+
+export function updatePlantInDb(
+  userId: string,
+  plantId: string,
+  data: {
+    gardenId?: string | null;
+    name?: string;
+    species?: string;
+    location?: string;
+    notes?: string;
+  },
+) {
+  return prisma.plant.update({
+    where: { id: plantId, userId },
+    data: {
+      ...(data.gardenId !== undefined ? { gardenId: data.gardenId } : {}),
+      ...(data.name !== undefined ? { name: data.name } : {}),
+      ...(data.species !== undefined ? { species: data.species } : {}),
+      ...(data.location !== undefined ? { location: data.location } : {}),
+      ...(data.notes !== undefined ? { notes: data.notes } : {}),
+    },
+    include: {
+      garden: {
+        select: { id: true, name: true },
+      },
+    },
+  });
+}
+
+export function deletePlantInDb(userId: string, plantId: string) {
+  return prisma.plant.delete({
+    where: { id: plantId, userId },
+  });
+}

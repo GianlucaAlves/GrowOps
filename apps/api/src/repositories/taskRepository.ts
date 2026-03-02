@@ -49,3 +49,43 @@ export function updateTaskCompletionInDb(
     },
   });
 }
+
+export function findTaskByIdAndUser(userId: string, taskId: string) {
+  return prisma.task.findFirst({
+    where: {
+      id: taskId,
+      userId,
+    },
+  });
+}
+
+export function updateTaskInDb(
+  userId: string,
+  taskId: string,
+  data: {
+    title?: string;
+    type?: "watering" | "feeding" | "note" | "photo";
+    dueAt?: Date;
+  },
+) {
+  return prisma.task.update({
+    where: {
+      id: taskId,
+      userId,
+    },
+    data: {
+      ...(data.title !== undefined ? { title: data.title } : {}),
+      ...(data.type !== undefined ? { type: data.type } : {}),
+      ...(data.dueAt !== undefined ? { dueAt: data.dueAt } : {}),
+    },
+  });
+}
+
+export function deleteTaskInDb(userId: string, taskId: string) {
+  return prisma.task.delete({
+    where: {
+      id: taskId,
+      userId,
+    },
+  });
+}
