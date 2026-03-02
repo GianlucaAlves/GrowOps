@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routes/auth";
+import taskRouter from "./routes/tasks";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 
@@ -22,6 +23,8 @@ app.get("/api/v1/health", (_req: Request, res: Response) => {
 
 app.use("/api/v1/auth", router);
 app.use("/api/auth", router);
+
+app.use("/api/v1/tasks", taskRouter);
 
 app.use((req: Request, res: Response) => {
   if (req.path.startsWith("/api/")) {
