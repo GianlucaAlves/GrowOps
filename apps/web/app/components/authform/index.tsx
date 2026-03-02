@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Card } from "@/app/components/ui/card";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
 
 type Props = { mode: "register" | "login" };
 
@@ -12,7 +15,7 @@ export default function AuthForm({ mode }: Props) {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const apiBase =
-    process.env.NEXT_PUBLIC_API_URL;
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api/v1";
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +37,11 @@ export default function AuthForm({ mode }: Props) {
       if (!res.ok) {
         throw new Error(payload.message || "Error");
       }
+
+      if (mode === "login" && payload.accessToken) {
+        localStorage.setItem("accessToken", payload.accessToken);
+      }
+
       setSuccess(true);
       setTimeout(() => {
         router.push("/");
@@ -47,65 +55,89 @@ export default function AuthForm({ mode }: Props) {
   }
 
   return (
-    <form
-      className=" max-w-sm mx-auto p-4 bg-white rounded shadow"
-      onSubmit={handleSubmit}
-    >
-      <h2 className="text-xl font-bold mb-4">
-        {mode === "register" ? "Register" : "Login"}
-      </h2>
-      {mode === "register" && (
-        <label className="block mb-2">
-          Name
-          <input
-            type="text"
+    <Card className="mx-auto mt-8 w-full max-w-md rounded-3xl p-6 md:p-7">
+      <div className="mb-6 text-center">
+        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-xl text-primary-foreground">
+          {mode === "register" ? "🌱" : "🔐"}
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight">
+          {mode === "register" ? "Criar conta" : "Entrar"}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {mode === "register"
+            ? "Comece seu diário de cultivo em poucos segundos"
+            : "Acesse suas tarefas e registros do jardim"}
+        </p>
+      </div>
+
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        {mode === "register" && (
+          <label className="block space-y-1.5">
+            <span className="text-sm font-medium">Nome</span>
+            <Input
+              type="text"
+              required
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+              aria-label="Nome"
+              placeholder="Seu nome"
+            />
+          </label>
+        )}
+
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">Email</span>
+          <Input
+            type="email"
             required
-            value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            className="w-full p-2 border rounded"
-            aria-label="Name"
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            aria-label="Email"
+            placeholder="voce@email.com"
           />
         </label>
-      )}
-      <label className="block mb-2">
-        Email
-        <input
-          type="email"
-          required
-          value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-          className="w-full p-2 border rounded"
-          aria-label="Email"
-        />
-      </label>
-      <label className="block mb-4">
-        Password
-        <input
-          type="password"
-          required
-          minLength={8}
-          value={form.password}
-          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-          className="w-full p-2 border rounded"
-          aria-label="Password"
-        />
-      </label>
-      {error && <div className="text-red-600 mb-2">{error}</div>}
-      {success && (
-        <div className="text-green-600 mb-2">
+
+        <label className="block space-y-1.5">
+          <span className="text-sm font-medium">Senha</span>
+          <Input
+            type="password"
+            required
+            minLength={8}
+            value={form.password}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, password: e.target.value }))
+            }
+            aria-label="Senha"
+            placeholder="Mínimo de 8 caracteres"
+          />
+        </label>
+
+        {error && (
+          <div className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
             {mode === "register"
-            ? "Registration sucessul! Redirecting..."
-        : "Login sucessful! Redirecting"}
-        </div>
-      )}
-      <button
-        type="submit"
-        disabled={loading}
-        className="bg-green-600 text-white px-4 py-2 rounded w-full"
-        aria-busy={loading}
-      >
-        {loading ? "Loading..." : mode === "register" ? "Register" : "Login"}
-      </button>
-    </form>
+              ? "Cadastro realizado com sucesso! Redirecionando..."
+              : "Login realizado com sucesso! Redirecionando..."}
+          </div>
+        )}
+
+        <Button
+          type="submit"
+          disabled={loading}
+          className="h-11 w-full rounded-xl"
+          aria-busy={loading}
+        >
+          {loading
+            ? "Carregando..."
+            : mode === "register"
+              ? "Criar conta"
+              : "Entrar"}
+        </Button>
+      </form>
+    </Card>
   );
 }

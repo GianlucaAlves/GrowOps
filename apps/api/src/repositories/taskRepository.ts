@@ -14,3 +14,38 @@ export function getTodayTasksForUser(userId: string) {
     orderBy: { dueAt: "asc" },
   });
 }
+
+export function createTaskInDb(
+  userId: string,
+  data: {
+    title: string;
+    type: "watering" | "feeding" | "note" | "photo";
+    dueAt: Date;
+  },
+) {
+  return prisma.task.create({
+    data: {
+      userId,
+      title: data.title,
+      type: data.type,
+      dueAt: data.dueAt,
+      completed: false,
+    },
+  });
+}
+
+export function updateTaskCompletionInDb(
+  userId: string,
+  taskId: string,
+  completed: boolean,
+) {
+  return prisma.task.updateMany({
+    where: {
+      id: taskId,
+      userId,
+    },
+    data: {
+      completed,
+    },
+  });
+}

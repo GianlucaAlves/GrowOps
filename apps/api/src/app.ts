@@ -3,6 +3,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import router from "./routes/auth";
 import taskRouter from "./routes/tasks";
+import gardenRouter from "./routes/gardens";
+import plantRouter from "./routes/plants";
+import eventRouter from "./routes/events";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 
@@ -25,6 +28,9 @@ app.use("/api/v1/auth", router);
 app.use("/api/auth", router);
 
 app.use("/api/v1/tasks", taskRouter);
+app.use("/api/v1/gardens", gardenRouter);
+app.use("/api/v1/plants", plantRouter);
+app.use("/api/v1/events", eventRouter);
 
 app.use((req: Request, res: Response) => {
   if (req.path.startsWith("/api/")) {
